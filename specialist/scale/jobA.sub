@@ -1,0 +1,28 @@
+# Overnight scale-up job A: T1, T3, T4, up to 100 items per template.
+# Procs 0..$(NW)-1: GPU workers on 2 A40s each (worker.py); proc $(NW): CPU pipeline loop (pipeline.py).
+# Submit from vision-h01:  condor_submit jobA.sub   (see submit_scale.sh)
+NW             = 4
+universe       = vanilla
+executable     = /home/joeyw3/world_model/pvideo/pseudo/scale/run.sh
+getenv         = false
+initialdir     = /home/joeyw3/world_model/pvideo/pseudo
+output         = /shared/rsaas/joeyw3/pvideo_pseudo/logs/scale/jobA_$(Cluster)_$(Process).out
+error          = /shared/rsaas/joeyw3/pvideo_pseudo/logs/scale/jobA_$(Cluster)_$(Process).err
+log            = /shared/rsaas/joeyw3/pvideo_pseudo/logs/scale/jobA_$(Cluster).log
+success_exit_code = 0
+
+arguments      = video scale/worker.py A T1,T3,T4 /shared/rsaas/joeyw3/pvideo_pseudo/scale/work_A.txt $(Process)
+requirements   = (GPUs_DeviceName == "NVIDIA A40")
+request_gpus   = 2
+request_cpus   = 6
+request_memory = 80GB
+max_retries    = 40
+queue $(NW)
+
+arguments      = qwen_video scale/pipeline.py A T1,T3,T4 $(NW)
+requirements   = regexp("^vision-c", Machine)
+request_gpus   = 0
+request_cpus   = 8
+request_memory = 64GB
+max_retries    = 3
+queue 1

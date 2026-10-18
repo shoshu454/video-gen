@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+stage_a/logs/*
+!stage_a/logs/.gitkeep
+*.tmp-*

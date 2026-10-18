@@ -1,0 +1,14 @@
+# Submit from vision-h01:  condor_submit pvideo.sub JOBS=<file with one "cmd T args" line per job> TAG=<name>
+universe       = vanilla
+executable     = /home/joeyw3/world_model/pvideo/prod/job.sh
+arguments      = $(args)
+getenv         = false
+initialdir     = /home/joeyw3/world_model/pvideo/prod
+requirements   = regexp("^vision-c", Machine) $(EXTRA_REQ)
+request_cpus   = 2
+request_memory = 32GB
+request_gpus   = 0
+output         = /shared/rsaas/joeyw3/pvideo/_work/logs/$(TAG)_$(Cluster)_$(Process).out
+error          = /shared/rsaas/joeyw3/pvideo/_work/logs/$(TAG)_$(Cluster)_$(Process).err
+log            = /shared/rsaas/joeyw3/pvideo/_work/logs/$(TAG)_$(Cluster).log
+queue args from $(JOBS)

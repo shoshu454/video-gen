@@ -1,0 +1,21 @@
+# Extra job B workers on 1 A40 each (serial SAM2 / MonST3R; worker.py drops --parallel with one GPU), added
+# 2026-10-11 because the 2-GPU workers of jobB.sub stayed idle. They share clips with the job B workers through
+# <ROOT>/scale/claims. Tag B1, so their done markers (workers/B1_*.done) don't count towards pipeline.py B's 4.
+# Submit from vision-h01:  condor_submit jobB_1gpu.sub
+NW             = 4
+universe       = vanilla
+executable     = /home/joeyw3/world_model/pvideo/pseudo/scale/run.sh
+getenv         = false
+initialdir     = /home/joeyw3/world_model/pvideo/pseudo
+output         = /shared/rsaas/joeyw3/pvideo_pseudo/logs/scale/jobB1_$(Cluster)_$(Process).out
+error          = /shared/rsaas/joeyw3/pvideo_pseudo/logs/scale/jobB1_$(Cluster)_$(Process).err
+log            = /shared/rsaas/joeyw3/pvideo_pseudo/logs/scale/jobB1_$(Cluster).log
+success_exit_code = 0
+
+arguments      = video scale/worker.py B1 T5,T6 /shared/rsaas/joeyw3/pvideo_pseudo/scale/work_B.txt $(Process)
+requirements   = (GPUs_DeviceName == "NVIDIA A40")
+request_gpus   = 1
+request_cpus   = 6
+request_memory = 80GB
+max_retries    = 40
+queue $(NW)

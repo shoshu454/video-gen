@@ -1,0 +1,25 @@
+# Stage A on HTCondor. Set the folders below, then from this folder (on vision-h01: condor_submit fails on vision-c22):
+#   condor_submit stage_a.sub
+# INPUT_DIR is a standard-format folder (make it with adapters/generic.py, see ../README.md). Each job takes every
+# NJOBS-th video (--shard i/NJOBS) on 1 A40. Resubmitting is safe: finished videos (DONE) and finished modalities are
+# skipped. Logs: logs/stage_a_<cluster>_<job>.{out,err,log}; per-video failures: OUTPUT_DIR/failures.jsonl
+INPUT_DIR      = /path/to/standard_format_input
+OUTPUT_DIR     = /path/to/stage_a_output
+NJOBS          = 1
+EXTRA_ARGS     =
+
+universe       = vanilla
+executable     = stage_a.sh
+arguments      = "$(INPUT_DIR) $(OUTPUT_DIR) $(Process)/$(NJOBS) $(EXTRA_ARGS)"
+getenv         = false
+requirements   = (GPUs_DeviceName == "NVIDIA A40")
+request_gpus   = 1
+request_cpus   = 6
+request_memory = 80GB
+request_disk   = 50GB
+output         = logs/stage_a_$(Cluster)_$(Process).out
+error          = logs/stage_a_$(Cluster)_$(Process).err
+log            = logs/stage_a_$(Cluster).log
+max_retries    = 20
+success_exit_code = 0
+queue $(NJOBS)

@@ -1,0 +1,21 @@
+# Job B CPU pipeline loop alone (replaces proc 4 of jobB.sub, whose node vision-c03 ran out of local disk for the
+# fused KITTI clips). Pinned to vision-c14 (2.2 TB disk); /tmp is under the job's scratch, so request_disk covers
+# the ~0.85 GB per fused KITTI clip. No --fetch: scale/FETCH_DONE already exists.
+# Submit from vision-h01:  condor_submit jobB_pipe.sub
+universe       = vanilla
+executable     = /home/joeyw3/world_model/pvideo/pseudo/scale/run.sh
+getenv         = false
+initialdir     = /home/joeyw3/world_model/pvideo/pseudo
+output         = /shared/rsaas/joeyw3/pvideo_pseudo/logs/scale/jobBpipe_$(Cluster).out
+error          = /shared/rsaas/joeyw3/pvideo_pseudo/logs/scale/jobBpipe_$(Cluster).err
+log            = /shared/rsaas/joeyw3/pvideo_pseudo/logs/scale/jobBpipe_$(Cluster).log
+success_exit_code = 0
+
+arguments      = qwen_video scale/pipeline.py B T5,T6 4
+requirements   = (Machine == "vision-c14.cs.illinois.edu")
+request_gpus   = 0
+request_cpus   = 8
+request_memory = 64GB
+request_disk   = 200GB
+max_retries    = 3
+queue 1

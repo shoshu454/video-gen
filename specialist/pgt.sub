@@ -1,0 +1,16 @@
+# Submit from vision-h01:  condor_submit pgt.sub JOBS=<file with one "clip [flags]" line per job> TAG=<name>
+universe       = vanilla
+executable     = /home/joeyw3/world_model/pvideo/pseudo/pgt_job.sh
+arguments      = $(args)
+getenv         = false
+initialdir     = /home/joeyw3/world_model/pvideo/pseudo
+requirements   = (GPUs_DeviceName == "NVIDIA A40")
+request_cpus   = 4
+request_memory = 64GB
+request_gpus   = 1
+output         = /shared/rsaas/joeyw3/pvideo_pseudo/logs/$(TAG)_$(Cluster)_$(Process).out
+error          = /shared/rsaas/joeyw3/pvideo_pseudo/logs/$(TAG)_$(Cluster)_$(Process).err
+log            = /shared/rsaas/joeyw3/pvideo_pseudo/logs/$(TAG)_$(Cluster).log
+max_retries    = 40
+success_exit_code = 0
+queue args from $(JOBS)
